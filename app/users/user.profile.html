@@ -1,0 +1,97 @@
+<ion-navbar dark style="opacity:0.5" *navbar>
+  <ion-title>
+
+  </ion-title>
+</ion-navbar>
+
+<ion-content>
+
+  <div class="user-profile">
+  	<img class="avatar" src="https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcTF_erFD1SeUnxEpvFjzBCCDxLvf-wlh9ZuPMqi02qGnyyBtPWdE-3KoH3s" alt="Ash" />
+    <div class="username" (click)="presentPrompt()" >{{user.profile.displayName}}</div>
+    <div class="bio">{{user.profile.musicProfile.about}}<p></div>
+<!--
+    <ul class="data">
+      <li>
+        <span class="entypo-heart"> 127</span>
+      </li>
+      <li>
+        <span class="entypo-eye"> 853</span>
+      </li>
+      <li>
+        <span class="entypo-user"> 311</span>
+      </li>
+   </ul> -->
+</div>
+
+<ion-list>
+  <ion-item-group>
+
+    <ion-item-divider light>Social</ion-item-divider>
+      <ion-item>
+        <ion-label>Facebook</ion-label>
+        <ion-toggle disabled checked="false"></ion-toggle>
+      </ion-item>
+      <ion-item>
+        <ion-label>Spotify</ion-label>
+        <ion-toggle [(ngModel)]="isConnected.spotify"  (change)="connectSpotify()"></ion-toggle>
+      </ion-item>
+
+     <ion-item-divider light>Musical Profile</ion-item-divider>
+       <ion-item>
+           <ion-label>Instrument</ion-label>
+           <ion-select (change)="updateProfile()" [(ngModel)]="user.profile.musicProfile.instrument" multiple="false" cancelText="Cancel" okText="OK">
+             <ion-option *ngFor="#instrument of instrumentList" value="{{instrument.code}}" >{{instrument.name}}</ion-option>
+           </ion-select>
+       </ion-item>
+       <ion-item>
+           <ion-label>Experience Level</ion-label>
+           <ion-select (change)="updateProfile()" [(ngModel)]="user.profile.musicProfile.experience" multiple="false" cancelText="Cancel" okText="OK">
+             <ion-option *ngFor="#level of experienceList" value="{{level.code}}" >{{level.name}}</ion-option>
+           </ion-select>
+
+       </ion-item>
+
+     <ion-item-divider light>My Bands</ion-item-divider>
+     <ion-item *ngFor="#band of user.profile.bands">
+       <ion-avatar item-left>
+         <img src="img/avatar-finn.png">
+       </ion-avatar>
+       <h2>{{band.name}}</h2>
+     </ion-item>
+
+     <!-- <ion-list ng-repeat="band in user.bands">
+           <ion-radio class="item item-avatar" ng-model="choice" ng-value="'A'"> <img src="venkman.jpg"><h2>{{band.name}}</h2> <p>Back off, man. I'm a scientist.</p></ion-radio>
+       </ion-list>
+      -->
+   </ion-item-group>
+</ion-list>
+
+
+<!-- <div class="wrapper">
+  <img src="https://goo.gl/LS1Lls" alt="">
+  <article>
+    <h2><a href="http://www.twitter.com/random_studio" target="_blank" >@random_studio</a> mentioned you</h2>
+    <p>
+      <a href="http://www.twitter.com/waynespiegel" target="_blank">@waynespiegel</a> How would you like to intern with us this summer?
+    </p>
+  </article>
+  <nav>
+    <ul>
+      <li class="time">10m</li>
+      <li><ion-icon name="star"></ion-icon></li>
+      <li><a href="#"><ion-icon name="star"></ion-icon></a></li>
+      <li><a href="#" class="fontawesome-reply"></a></li>
+    </ul>
+  </nav>
+</div>
+ <ion-input type="text" value=""></ion-input>
+<div class="md-chip gray">
+
+    <span class="md-chip-text">chip asdasdsa</span>
+  </div>
+
+ -->
+
+
+</ion-content>

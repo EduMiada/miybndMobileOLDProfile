@@ -1,0 +1,50 @@
+<!--ion-content padding class="logon"-->
+
+<ion-content padding class="logon" scroll="false" overflow-scroll="true" >
+
+    <section class="login-container" >
+
+
+        <div class = "row header">
+            <div class = "col text-center">
+                <h2 style="color:#fff">Login  <i class="ion ion-person"></i></h2>
+            </div>
+        </div>
+
+
+        <div class="padding">
+            <label class="item item-input" padding>
+                <input type="text" id="username" name="username" data-ng-model="credentials.username" placeholder="Enter your username">
+            </label>
+            <div style="height: 10px;" class="spacer"></div>
+            <label class="col item item-input">
+                <input type="password" id="password" name="password" data-ng-model="credentials.password" placeholder="Enter your password">
+            </label>
+        </div>
+        <p>
+
+        <div class="col button-row ">
+            <button class="button button-block action-button button-balanced"  (click)="doSubmit()">Sign In with Email</button>
+        </div>
+        <div class="col button-row ">
+            <button class="button button-block action-button button-positive facebookColor icon ion-social-facebook" on-tap="facebookSignIn()">&nbsp;Connect with Facebook</button>
+        </div>
+
+
+         <div class="row text-center">
+                <span class="mdi mdi-music-circle" class="icon" style="font-size: 60px; line-height: 30px; 	margin-bottom: 10px; color:#ccc"></span>
+                <h2>Manage Setlists</h2>
+
+        </div>
+          <div class="row text-center">
+                <span class="mdi mdi-music-circle" class="icon" style="font-size: 60px; line-height: 30px; 	margin-bottom: 10px; color:#ccc"></span>
+
+                <p>Organize songs in setlist for Gigs and Rehearsals.</p>
+        </div>
+
+
+    </section>
+
+
+
+ </ion-content>

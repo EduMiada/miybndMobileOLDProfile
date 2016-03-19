@@ -1,0 +1,31 @@
+.logon {
+  background: #387ef5;  
+}
+.login-container {
+  display: -webkit-flex;
+  -webkit-flex-direction: column;
+  height: 100%;
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #000), color-stop(100%, #000));
+  background: -webkit-linear-gradient(top, #000 0%, #000 100%);
+  background: #387ef5; }
+
+.login-container > .button-row img {
+  max-width: 80%; }
+
+.login-container > .header {
+  -webkit-flex: 4;
+  padding-top: 20px; }
+
+.login-container > .row {
+  -webkit-flex: 1; }
+
+.header {
+  -webkit-flex: 1.5 !important;
+  -webkit-align-items: center; }
+
+.icon-row {
+  -webkit-align-items: center; }
+
+.facebookColor {
+  background: #3b5998 !important; }
+

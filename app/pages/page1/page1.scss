@@ -1,0 +1,24 @@
+.page1 {
+
+
+
+
+}
+
+body.md {
+  
+  .tabs-icon tabbar {
+    background-color: #f53d3d;
+
+    a {
+      color: #fff;
+    }
+    a[aria-selected="true"] {
+      color: #fff !important;
+    }
+  }
+  .tabs-icon tab-highlight {
+    color: #fff;
+    background-color: #fff;
+  }
+}
