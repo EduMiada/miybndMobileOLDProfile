@@ -29,7 +29,7 @@ export class CoreServices {
     SERVER_URL() {
       let url = {
          API_URL:'http://miada.com.br:3000/v1/api',
-         //API_URL:'http://localhost:3000/v1/api',
+         //API_URL:'http://192.168.1.5:3000/v1/api',
          API_AUTH_FACEBOOK :  '/auth/facebook',
          API_FACEBOOK_CLIENT_ID: '162506894117176',
          API_SPOTIFY_CLIENT_ID: '5063d7fc578d4b928e96e050790860c9',
@@ -86,6 +86,17 @@ export class CoreServices {
         }else{
             return  this.http.post(serverUrl + url, {headers:headers});
         }
+    }
+
+    //return http post response
+    httpDelete(url, data){
+        let serverUrl =  this.SERVER_URL().API_URL;
+        let headers = new Headers();
+
+        headers.append('Content-Type' , 'application/json');
+        headers.append('x-access-token', this.token);
+
+        return  this.http.delete(serverUrl + url, {headers:headers}, {param:{provider:'spotify'}});
     }
 
 

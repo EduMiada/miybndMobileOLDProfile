@@ -63725,7 +63725,7 @@
 	        value: function SERVER_URL() {
 	            var url = {
 	                API_URL: 'http://miada.com.br:3000/v1/api',
-	                //API_URL:'http://localhost:3000/v1/api',
+	                //API_URL:'http://192.168.1.5:3000/v1/api',
 	                API_AUTH_FACEBOOK: '/auth/facebook',
 	                API_FACEBOOK_CLIENT_ID: '162506894117176',
 	                API_SPOTIFY_CLIENT_ID: '5063d7fc578d4b928e96e050790860c9',
@@ -72719,40 +72719,22 @@
 	        value: function connectSpotify() {
 	            var _this3 = this;
 
-	            var dialogOptions = ['user-read-email', 'user-read-private', 'playlist-read-collaborative', 'playlist-modify-public', 'playlist-modify-private'];
 	            var url = this.core.SERVER_URL().API_USERS + '/' + this.profile.id + this.core.SERVER_URL().API_SPOTIFY_CONNECT;
+	            var dialogOptions = ['user-read-email', 'user-read-private', 'playlist-read-collaborative', 'playlist-modify-public', 'playlist-modify-private'];
 
 	            this.cordovaOauth = new _core3.CordovaOauth(new _core3.Spotify({ clientId: this.core.SERVER_URL().API_SPOTIFY_CLIENT_ID, response_type: 'code', appScope: [""], show_dialog: dialogOptions }));
 	            this.cordovaOauth.login().then(function (success) {
 
-	                //save token to server
+	                var user = _this3.core.getStoreObject('user');
+
 	                var body = JSON.stringify({ spotifyprofile: success });
-
-	                alert(body);
-	                alert(url);
-	                _this3.core.httpPost(url, body).map(function (res) {
-	                    return alert(res);
-	                })
-	                //  .map(res => alert(res))
-	                //  .map(data => this.setSession(data))
-	                //  .map(this.profile = data)
-	                .catch(_this3.handleError);
-
-	                //               //send code to server to create token and save to user profile
-	                //   $http.post(SERVER.API_URL  + SERVER.API_USERS + '/' + o.id + SERVER.API_SPOTIFY_CONNECT, {spotifyprofile:result } )
-	                //       .success(function(response){
-	                //       o.setSessionAPI(response);
-	                //       Spotify.setAuthToken(o.spotifyToken);
-	                //
-	                //       alert('successfuly connected to spotify ');
-	                //   });
-	                //
-	                //  // $scope.updateInfo();
-	                // }, function(error) {
-	                //     alert("Could not connect to spotify" + error);
-	                // });
-
-	                //  alert('resultado' +  JSON.stringify(success));
+	                return _this3.core.httpPost(url, body).map(function (res) {
+	                    return res.json();
+	                }).map(function (data) {
+	                    return user.data.additionalProvidersData = data.additionalProvidersData;
+	                }).map(function (data) {
+	                    return _this3.setProfile(res.json());
+	                }).catch(_this3.handleError);
 	            }, function (error) {
 	                alert('Could not connect to Spotify account.' + error);
 	            });
@@ -73145,7 +73127,8 @@
 	        this.spotifyOptions = options;
 	        this.spotifyOptions.redirectUri = options.hasOwnProperty("redirectUri") ? options.redirectUri : "http://localhost/callback";
 
-	        this.flowUrl = "https://accounts.spotify.com/authorize?client_id=" + this.spotifyOptions.clientId + '&redirect_uri=' + this.spotifyOptions.redirectUri + '&response_type=token&scope=&' + this.spotifyOptions.show_dialog;
+	        this.flowUrl = "https://accounts.spotify.com/authorize?client_id=" + this.spotifyOptions.clientId + '&redirect_uri=' + this.spotifyOptions.redirectUri + '&response_type=code&scope=&' + this.spotifyOptions.show_dialog;
+
 
 	        if (options !== undefined && options.hasOwnProperty("authType")) {
 	            this.flowUrl += "&auth_type=" + options.authType;
@@ -73154,6 +73137,7 @@
 	    Spotify.prototype.login = function () {
 	        var _this = this;
 
+
 	        return new Promise(function (resolve, reject) {
 	            var browserRef = window.cordova.InAppBrowser.open(_this.flowUrl, "_blank", "location=no,clearsessioncache=yes,clearcache=yes");
 
@@ -73161,8 +73145,28 @@
 	                if ((event.url).indexOf(_this.spotifyOptions.redirectUri) === 0) {
 	                    browserRef.removeEventListener("exit", function (event) { });
 	                    browserRef.close();
-	                    var parsedResponse = (new utility_1.OauthUtility()).parseImplicitResponse(((event.url).split("#")[1]).split("&"));
-	                    alert(parsedResponse);
+
+	                    var splitChar = (_this.spotifyOptions.response_type === "code") ? "?" : "#";
+
+	                    var callbackResponse = (event.url).split(splitChar)[1];
+	                    var responseParameters = (callbackResponse).split("&");
+	                    var parameterMap = [];
+	                    for(var i = 0; i < responseParameters.length; i++) {
+	                      parameterMap[responseParameters[i].split("=")[0]] = responseParameters[i].split("=")[1];
+	                    }
+
+	                    if(_this.spotifyOptions.response_type === "token" && parameterMap.access_token !== undefined && parameterMap.access_token !== null) {
+	                      var parsedResponse = { access_token: parameterMap.access_token, expires_in: parameterMap.expires_in, account_username: parameterMap.account_username };
+	                    }
+	                    else if(_this.spotifyOptions.response_type === "code" && parameterMap.code !== undefined && parameterMap.code !== null) {
+	                      var parsedResponse = { code: parameterMap.code, state: parameterMap.state };
+	                    } else {
+	                      var parsedResponse = false;
+	                    }
+
+
+	                  //  var parsedResponse = (new utility_1.OauthUtility()).parseImplicitResponse(((event.url).split("#")[1]).split("&"));
+	                
 	                    if (parsedResponse) {
 	                        resolve(parsedResponse);
 	                    }
@@ -73433,7 +73437,8 @@
 
 	    this.user = _user;
 	    this.nav = _nav;
-	    this.isConnected = { spotify: this.user.profile.spotifyToken, facebook: false };
+
+	    this.isConnected = { spotify: false, facebook: false };
 	    this.instrumentList = [{ code: 'GUITAR', name: 'Guitar' }, { code: 'BASS', name: 'Bass' }, { code: 'VOCAL', name: 'Vocal' }, { code: 'DRUM', name: 'Drum' }];
 	    this.channelList = [{ code: 'YOUTUBE', name: 'YouTube' }, { code: 'SUNDCLOUD', name: 'SoundCloud' }];
 	    this.experienceList = [{ code: 'BEGINNER', name: 'Beginner' }, { code: 'INTEMEDIATE', name: 'Intermediate' }, { code: 'ADVANCED', name: 'Advanced' }, { code: 'NINJA', name: 'Ninja' }];
@@ -73451,31 +73456,39 @@
 
 	      var result = [];
 	      this.user.loadProfile().subscribe(function (data) {
-	        return result = data;
+	        result = data;if (_this.user.profile.spotifyToken) _this.isConnected.spotify = true;
 	      }, function (err) {
 	        return console.log('Erro', err);
 	      }, function () {
-	        return console.log('profile loaded', _this.user.profile);
+	        return console.log('fim');
 	      });
 	    }
 	  }, {
 	    key: 'connectSpotify',
 	    value: function connectSpotify() {
+	      var _this2 = this;
+
 	      //if not already connected and selected the on option / open the oauth connection
 	      if (this.isConnected.spotify && !this.user.profile.spotifyToken) {
-	        this.user.connectSpotify();
+	        this.user.connectSpotify().subscribe(function (data) {
+	          return console.log(data);
+	        }, function (err) {
+	          return console.log('Erro', err);
+	        }, function () {
+	          return console.log('profile loaded', _this2.user.profile);
+	        });
 	      }
 
 	      //if already connected open dialog to confirm disconnection
-	      if (!this.isConnected.spotify && this.user.profile.spotifyToken) {
-
+	      if (!this.isConnected.spotify && this.user.profile.spotifyToken != '') {
 	        var confirm = _ionicAngular.Alert.create({
 	          title: 'Disconnect Spotify',
 	          message: 'Are you sure you wanto to disconnect Spotify account?',
 	          buttons: [{
 	            text: 'Cancel',
 	            handler: function handler() {
-	              console.log('Disagree clicked');
+	              //change de flag to true again
+	              _this2.isConnected.spotify = true;
 	            }
 	          }, {
 	            text: 'Yes',
@@ -73484,6 +73497,7 @@
 	            }
 	          }]
 	        });
+	        this.nav.present(confirm);
 	      }
 	      //return true;
 	    }
@@ -73502,7 +73516,7 @@
 	  }, {
 	    key: 'presentPrompt',
 	    value: function presentPrompt() {
-	      var _this2 = this;
+	      var _this3 = this;
 
 	      var alert = _ionicAngular.Alert.create({
 	        //  title: 'Say something about you',
@@ -73520,8 +73534,8 @@
 	        }, {
 	          text: 'Save',
 	          handler: function handler(data) {
-	            _this2.user.profile.musicProfile.about = data.about;
-	            _this2.updateProfile();
+	            _this3.user.profile.musicProfile.about = data.about;
+	            _this3.updateProfile();
 
 	            //if (User.isValid(data.username, data.password)) {
 	            // logged in!

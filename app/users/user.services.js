@@ -108,44 +108,42 @@ export class UserServices {
 
     //connect to spotify user account and save token to the server
     connectSpotify(){
-
-      let dialogOptions = ['user-read-email', 'user-read-private', 'playlist-read-collaborative', 'playlist-modify-public', 'playlist-modify-private'];
       let url = this.core.SERVER_URL().API_USERS + '/' + this.profile.id + this.core.SERVER_URL().API_SPOTIFY_CONNECT;
+      let dialogOptions = ['user-read-email', 'user-read-private', 'playlist-read-collaborative', 'playlist-modify-public', 'playlist-modify-private'];
 
-    //    this.cordovaOauth = new CordovaOauth(new Spotify({clientId: this.core.SERVER_URL().API_SPOTIFY_CLIENT_ID,response_type:'code',appScope: [""],show_dialog: dialogOptions }));
-    //        this.cordovaOauth.login().then((success) => {
-              //save token to server
-              //let body = JSON.stringify({spotifyprofile:success});
-              let body = JSON.stringify({spotifyprofile:'token:asdasdasdasdasasd'});
-              console.log('aqui', body);
+        this.cordovaOauth = new CordovaOauth(new Spotify({clientId: this.core.SERVER_URL().API_SPOTIFY_CLIENT_ID,response_type:'code',appScope: [""],show_dialog: dialogOptions }));
+            this.cordovaOauth.login().then((success) => {
+
+              let user = this.core.getStoreObject('user');
+
+              let body =  JSON.stringify({spotifyprofile:success});
               return this.core.httpPost(url, body)
-                  .map(res => data);
+                  .map(res => res.json())
+                  .map(data => user.data.additionalProvidersData = data.additionalProvidersData)
+                  .map(data => this.setProfile(res.json()))
+                  .catch(this.handleError);
 
-                //  .map(res => alert(res))
-                 //  .map(data => this.setSession(data))
-                 //  .map(this.profile = data)
-              //    .catch(this.handleError);
-
-//               //send code to server to create token and save to user profile
-//   $http.post(SERVER.API_URL  + SERVER.API_USERS + '/' + o.id + SERVER.API_SPOTIFY_CONNECT, {spotifyprofile:result } )
-//       .success(function(response){
-//       o.setSessionAPI(response);
-//       Spotify.setAuthToken(o.spotifyToken);
-//
-//       alert('successfuly connected to spotify ');
-//   });
-//
-//  // $scope.updateInfo();
-// }, function(error) {
-//     alert("Could not connect to spotify" + error);
-// });
-
-
-              //  alert('resultado' +  JSON.stringify(success));
-      ////      }, (error) => {
-          //      alert('Could not connect to Spotify account.' +  error);
-      //      });
+            }, (error) => {
+                alert('Could not connect to Spotify account.' +  error);
+            });
     }
+
+
+    disconnectSpotify(){
+      let url = this.core.SERVER_URL().API_USERS + '/' + this.profile.id + this.core.SERVER_URL().API_USERS_ACCOUNTS;
+      let user = this.core.getStoreObject('user');
+
+      return this.core.httpDelete(url, JSON.stringify({provider:'spotify'}))
+        .map(res => console.log(res))
+        //  .map(res => {delete user.data.additionalProvidersData['spotify'], this.profile.spotifyToken=false})
+      //    .map(console.log('aqui parece que deleou'))
+    //      .map(data => this.setProfile(user))
+          .catch(this.handleError);
+
+      };
+
+
+
 
 
   //hande http observer error

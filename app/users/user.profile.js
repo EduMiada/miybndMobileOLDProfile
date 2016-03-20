@@ -14,6 +14,7 @@ export class UserProfile {
     this.user = _user;
     this.nav = _nav;
 
+    this.isConnected = {spotify:false,facebook:false};
     this.instrumentList = [{code:'GUITAR', name:'Guitar'}, {code:'BASS',name:'Bass'}, {code:'VOCAL',name:'Vocal'}, {code:'DRUM',name:'Drum'}];
     this.channelList = [{code:'YOUTUBE', name:'YouTube'}, {code:'SUNDCLOUD', name: 'SoundCloud'}];
     this.experienceList = [{code:'BEGINNER', name:'Beginner'}, {code:'INTEMEDIATE', name:'Intermediate'}, {code:'ADVANCED', name:'Advanced'}, {code:'NINJA', name:'Ninja'}]
@@ -21,33 +22,32 @@ export class UserProfile {
 
   ngOnInit() {
     this.loadProfile();
-      this.isConnected = {spotify:(this.user.profile.spotifyToken), facebook:false};
   }
 
   loadProfile(){
     let result = [];
     this.user.loadProfile()
       .subscribe(
-        data => result = data,
+        data => {result = data;  if(this.user.profile.spotifyToken) this.isConnected.spotify = true} ,
         err => console.log('Erro', err),
-        () =>   console.log('profile loaded', this.user.profile )
+        () => console.log('fim')
       );
   }
 
   connectSpotify(){
+
     //if not already connected and selected the on option / open the oauth connection
-  //  if (this.isConnected.spotify && !this.user.profile.spotifyToken){
+    if (this.isConnected.spotify && !this.user.profile.spotifyToken){
       this.user.connectSpotify()
       .subscribe(
         data => console.log(data),
         err => console.log('Erro', err),
         () =>   console.log('profile loaded', this.user.profile )
       );
-//    }
+    }
 
     //if already connected open dialog to confirm disconnection
-    if (!this.isConnected.spotify && this.user.profile.spotifyToken){
-
+    if (!this.isConnected.spotify && this.user.profile.spotifyToken != ''){
       let confirm = Alert.create({
           title: 'Disconnect Spotify',
           message: 'Are you sure you wanto to disconnect Spotify account?',
@@ -55,19 +55,34 @@ export class UserProfile {
             {
               text: 'Cancel',
               handler: () => {
-                console.log('Disagree clicked');
+                //change de flag to true again
+                this.isConnected.spotify =true;
               }
             },
             {
               text: 'Yes',
               handler: () => {
-                Alert('Agree clicked');
+                this.disconnectSpotify();
               }
             }
           ]
         });
+        this.nav.present(confirm);
+    }
+    //return true;
+  }
 
+  disconnectSpotify(){
 
+    //if not already connected and selected the on option / open the oauth connection
+    //if already connected open dialog to confirm disconnection
+    if (!this.isConnected.spotify && this.user.profile.spotifyToken != ''){
+      this.user.disconnectSpotify()
+        .subscribe(
+          data => {result = data;  if(this.user.profile.spotifyToken) this.isConnected.spotify = true} ,
+          err => console.log('Erro', err),
+          () =>   console.log('profile loaded', this.user.profile )
+        );
     }
     //return true;
   }
