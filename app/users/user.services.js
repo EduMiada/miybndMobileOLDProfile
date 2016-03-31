@@ -6,6 +6,7 @@ import 'rxjs/Rx';
 import {CoreServices} from '../core/core.services';
 import {User} from '../core/datatypes/user.type';
 import {CordovaOauth, Spotify} from 'ng2-cordova-oauth/core';
+import {Camera} from 'ionic-native';
 
 @Injectable()
 export class UserServices {
@@ -91,6 +92,9 @@ export class UserServices {
      };
 
 
+
+
+
      //update profile
      updateProfile (profile, contact, channels) {
        let url = this.core.SERVER_URL().API_USERS + '/' + this.profile.id + this.core.SERVER_URL().API_USER_PROFILE;
@@ -105,6 +109,18 @@ export class UserServices {
           //  .map(this.profile = data)
            .catch(this.handleError);
    	};
+
+    // attempt login or signup
+    setProfilePicture (picture) {
+      let url = this.core.SERVER_URL().API_USERS + '/' + this.profile.id + this.core.SERVER_URL().API_USER_PICTURE;
+      let body = JSON.stringify({picture:picture});
+
+      return this.core.httpPost(url, body)
+          .map(res => res.json())
+          .catch(this.handleError);
+  	};
+
+
 
     //connect to spotify user account and save token to the server
     connectSpotify(){
@@ -135,11 +151,7 @@ export class UserServices {
 
       return this.core.httpDelete(url, JSON.stringify({provider:'spotify'}))
         .map(res => console.log(res))
-        //  .map(res => {delete user.data.additionalProvidersData['spotify'], this.profile.spotifyToken=false})
-      //    .map(console.log('aqui parece que deleou'))
-    //      .map(data => this.setProfile(user))
-          .catch(this.handleError);
-
+        .catch(this.handleError);
       };
 
 
@@ -202,32 +214,40 @@ export class UserServices {
   destroySession() {
     this.core.setStoreObject('user', {});
     this.core.setHttpAccessToken(undefined);
-		this.token= false;
-		this.username=false;
-		this.server= false;
+		this.profile.token = false;
+		this.profile.username = false;
   };
 
+  takePicture(source){
 
-  // // set session data
-  // setSessionAPI (user) {
-  //
-  //
-  //   if (user.success){
-  //
-  //     if (user.token) this.token = user.token;
-  //     if (user.token) this.token = user.token;
-  //     if (user.username) this.username = user.username;
-  //
-  //     this.core.setStoreObject('user', user);
-  //
-  //     this.core.setServerUrlAPI(user.server);
-  //     this.core.setHttpAccessToken(this.token);
-  //     return true;
-  //   }
-  //
-  //
-  //   return false;
-  //
-	// };
+    let options = {
+        quality: 50,
+        destinationType:0, // Camera.DestinationType.DATA_URL,
+        sourceType: source, //Camera.PictureSourceType.CAMERA,
+        allowEdit: true,
+        encodingType: 0, //Camera.EncodingType.JPEG,
+        saveToPhotoAlbum: false,
+        correctOrientation:true
+    };
+
+    let user = this.core.getStoreObject('user');
+
+    return Camera.getPicture(options)
+      .then((imageData) => {
+        let base64Image = "data:image/jpeg;base64," + imageData;
+        this.setProfilePicture(base64Image)
+        .subscribe(
+          res => {  this.profile.picture = base64Image,
+                    user.data.picture = base64Image,
+                    this.core.setStoreObject('user', user);
+                },
+          err => err
+        );
+
+      },(err) => {
+        return err;
+      });
+
+  }
 
 }

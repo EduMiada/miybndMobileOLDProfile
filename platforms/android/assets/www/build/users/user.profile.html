@@ -1,13 +1,9 @@
-<ion-navbar dark style="opacity:0.5" *navbar>
-  <ion-title>
-
-  </ion-title>
+<ion-navbar primary *navbar>
+  <ion-title>Profile</ion-title>
 </ion-navbar>
-
 <ion-content>
-
-  <div class="user-profile">
-  	<img class="avatar" src="https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcTF_erFD1SeUnxEpvFjzBCCDxLvf-wlh9ZuPMqi02qGnyyBtPWdE-3KoH3s" alt="Ash" />
+  <div>
+  	<img class="avatar" (click)="takePicture()" src="{{user.profile.picture}}" alt="Ash" />
     <div class="username" (click)="presentPrompt()" >{{user.profile.displayName}}</div>
     <div class="bio">{{user.profile.musicProfile.about}}<p></div>
 <!--

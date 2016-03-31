@@ -1,5 +1,7 @@
-import {Page, NavController, Alert} from 'ionic-angular';
+import {Page, NavController, Alert, ActionSheet} from 'ionic-angular';
 import {UserServices} from '../users/user.services';
+//import {CameraServices} from '../core/camera.services';
+import {Camera} from 'ionic-native';
 
 @Page({
   templateUrl: 'build/users/user.profile.html'
@@ -33,6 +35,45 @@ export class UserProfile {
         () => console.log('fim')
       );
   }
+
+  takePicture(){
+    let actionSheet = ActionSheet.create({
+      title: 'Profile Picture',
+      buttons: [
+        {
+          text: 'Remove',
+          role: 'destructive',
+          handler: () => {
+            console.log('Destructive clicked');
+          }
+        },{
+          text: 'Galery',
+          handler: () => {
+            this.user.takePicture(0);
+          }
+        },
+        {
+          text: 'Camera',
+          handler: () => {
+            this.user.takePicture(1);
+          }
+        },
+
+        {
+          text: 'Cancel',
+          role: 'cancel',
+          handler: () => {
+            console.log('Cancel clicked');
+          }
+        }
+      ]
+    });
+    this.nav.present(actionSheet);
+
+
+
+  }
+
 
   connectSpotify(){
 

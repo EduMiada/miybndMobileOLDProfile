@@ -1,5 +1,6 @@
 import {App, IonicApp, Platform}  from 'ionic-angular';
 import {CoreServices} from './core/core.services';
+import {CameraServices} from './core/camera.services';
 import {UserServices} from './users/user.services';
 import {TabsPage} from  './core/tabs/tabs';
 import {LogonPage} from './core/logon/logon';
@@ -8,11 +9,12 @@ import {UserProfile} from './users/user.profile';
 
 
 
+
 @App({
   //template: '<ion-nav [root]="rootPage"></ion-nav>',
   templateUrl: 'build/app.html',
   config: {}, // http://ionicframework.com/docs/v2/api/config/Config/
-  providers: [CoreServices, UserServices]
+  providers: [CoreServices, UserServices, CameraServices]
 
 })
 export class MyApp {
